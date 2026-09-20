@@ -11,7 +11,6 @@ container:
   ports:
   - containerPort: 5000
 
-
 configMaps:
   - name: service-config.json
     mountPath: config.json
