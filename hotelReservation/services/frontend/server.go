@@ -91,6 +91,25 @@ func (s *Server) Run() error {
 
 	log.Info().Msg("Successful")
 
+	// Health check server
+	healthMux := http.NewServeMux()
+	healthMux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte("OK"))
+	})
+
+	healthSrv := &http.Server{
+		Addr:    ":8081",
+		Handler: healthMux,
+	}
+
+	go func() {
+		log.Info().Msg("Health server listening on :8081")
+		if err := healthSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Error().Err(err).Msg("Health server failed")
+		}
+	}()
+
 	log.Trace().Msg("frontend before mux")
 	mux := tracing.NewServeMux(s.Tracer)
 	mux.Handle("/", http.FileServer(http.FS(staticContent)))
