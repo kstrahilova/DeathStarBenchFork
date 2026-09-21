@@ -3,6 +3,14 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Values.name }}-{{ include "hotel-reservation.fullname" . }}
+  {{- if .Values.service.labels }}
+  labels:
+    {{- toYaml .Values.service.labels | nindent 4 }}
+  {{- end }}
+  {{- if .Values.service.annotations }}
+  annotations:
+    {{- toYaml .Values.service.annotations | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.serviceType | default .Values.global.serviceType }}
   ports:
